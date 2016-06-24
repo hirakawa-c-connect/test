@@ -1,0 +1,92 @@
+<select name = "kind" id = "kind">
+        <option value="0" selected>インクかトナーを選択</option>
+    <option value="3">インク</option>
+    <option value="4">トナー</option>
+</select>
+
+<select name = "makers" id = "maker" >
+    <option value="0">プリンターメーカーを選択</option>
+</select>
+
+<select name = "printer" id = "printer" >
+    <option value="0">プリンター機種を選択</option>
+</select>
+
+<script>
+	$('kind').addEvent('change',function(event) {
+        kind1 = $("kind").value;
+		if(kind1=="0"){
+            $("maker").innerHTML = '<option value="0">プリンターメーカーを選択</option>';
+            $("printer").innerHTML = '<option value="0">プリンター機種を選択</option>';
+		}else{
+			$("maker").innerHTML = "";
+			var myAjax = new Ajax('/index.php?option=com_virtuemart&page=shop.printer_search',{
+                method:'post',
+                data: 'kind=' + kind1,
+                onSuccess: function(txt) {
+                    var data = (new Function('return '+txt))();
+					for (var key in data) {
+						if (data.hasOwnProperty(key)) {
+                            var e_opt = document.createElement( "option" );
+                            var e_txt = document.createTextNode( data[key]['maker'] );
+                            e_opt.appendChild( e_txt );
+                            e_opt.setAttribute('value', data[key]['value']);
+                            $("maker").appendChild(e_opt);
+						}
+					}
+                    $("printer").innerHTML = '<option value="0">プリンター機種を選択</option>';
+                }
+            });
+			myAjax.request();
+		}
+        $("c_btn").disabled = "disabled";
+		$("c_btn").className = "c_btn_inactive";
+	});
+
+	$('maker').addEvent('change',function(event) {
+        maker1 = $("maker").value;
+		kind1 = $("kind").value;
+		if(maker1=="0"){
+			$("printer").innerHTML = '<option value="0">プリンター機種を選択</option>';
+		}else{
+			$("printer").innerHTML = "";
+			var myAjax = new Ajax('/index.php?option=com_virtuemart&page=shop.printer_search',{
+                method:'post',
+                data: 'maker='+maker1+'&kind='+kind1,
+                onSuccess: function(txt) {
+                    var data = (new Function('return '+txt))();
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            var e_opt = document.createElement( "option" );
+                            var e_txt = document.createTextNode( data[key]['printername'] );
+                            e_opt.appendChild( e_txt );
+                            e_opt.setAttribute('value', data[key]['value']);
+                            $("printer").appendChild(e_opt);
+                        }
+                    }
+                }
+            });
+            myAjax.request();
+        }
+        $("c_btn").disabled = "disabled";
+        $("c_btn").className = "c_btn_inactive";
+    });
+
+	$('printer').addEvent('change',function(event) {
+		printer1 = $("printer").value;
+		if(printer1=="/index.php/プリンター機種を選択.html#registerMyprinterBox-category"){
+			$("c_btn").disabled = "disabled";
+			$("c_btn").className = "c_btn_inactive";
+		}else{
+			$("c_btn").disabled = "";
+			$("c_btn").className = "c_btn_active";
+		}
+	});
+
+	function c_jump(){
+		var url = $("printer").value;
+		if(url != "" && url != "0"){
+			location.href = url;
+		}
+	}
+</script>

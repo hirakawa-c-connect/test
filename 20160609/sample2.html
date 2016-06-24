@@ -1,0 +1,84 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <script type="text/javascript" src="./script/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="./script/vue.min.js"></script>
+</head>
+<body>
+<div id="main">
+    <div>
+        <select id="kind" v-model="kind">
+            <option v-for="item in kindList" value="{{ item.value }}">{{ item.option }}</option>
+        </select>
+    </div>
+    <hr>
+    <div>
+        <select id="maker" v-if="makerList.length > 0" v-model="maker">
+            <option v-for="item in makerList" value="{{ item.value }}">{{ item.maker }}</option>
+        </select>
+    </div>
+    <hr>
+
+</div>
+<script>
+    var vm = new Vue({
+        el: '#main',
+        data: {
+            kind: 0,            /* インク種別 */
+            maker: 0,           /* メーカ */
+            params: {           /* 共通パラメータ */
+                type: 'GET'
+            },
+            kindList: [         /* インク種別リスト */
+                {
+                    value: 0,
+                    option: "インクかトナーを選択"
+                },
+                {
+                    value: 3,
+                    option: "インク"
+                },
+                {
+                    value: 4,
+                    option: "トナー"
+                }
+            ],
+            makerList: [            /* メーカ種別リスト */
+                {
+                    value: 0,
+                    maker: "プリンタメーカを選択"
+                }
+            ]
+        },
+        watch: {
+            'kind': function (newVal, oldVal) {
+                /* インク種別の変更検知 */
+                if (newVal > 0) {
+                    this.getMaker();
+                }
+            },
+            'maker': function (newVal, oldVal) {
+                /* メーカの変更検知 */
+            }
+        },
+        methods: {
+            /* メーカの取得処理 */
+            getMaker: function () {
+                var params = this.params;
+                params.url = 'http://ink-revolution.com/index.php';
+                params.data = {
+                    'option': 'com_virtuemart',
+                    'page': 'shop.printer_search',
+                    'kind': this.kind
+                };
+
+                $.ajax(params).done(function (data) {
+                    vm.makerList = eval(data);
+                });
+            }
+        }
+    });
+</script>
+</body>
+
+</html>
